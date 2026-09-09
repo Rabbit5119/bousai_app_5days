@@ -102,6 +102,41 @@
     accent-color: #2458a6;
   }
 
+  .resident-audience {
+    display: none;
+    margin: 20px 0 0;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+
+  .resident-audience.is-visible {
+    display: block;
+  }
+
+  .resident-audience legend {
+    margin-bottom: 8px;
+    color: #334155;
+    font-weight: 700;
+  }
+
+  .resident-audience-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0;
+    color: #334155;
+    cursor: pointer;
+  }
+
+  .resident-audience-option input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #2458a6;
+  }
+
   @media (max-width: 640px) {
     .board-status-list {
       flex-direction: column;
@@ -140,6 +175,34 @@
       住民への情報発信
     </label>
   </fieldset>
+
+  <fieldset class="resident-audience" id="resident-audience" aria-labelledby="resident-audience-title">
+    <legend id="resident-audience-title">対象者</legend>
+    <label class="resident-audience-option">
+      <input type="checkbox" name="audience" value="全住民">
+      全住民
+    </label>
+    <label class="resident-audience-option">
+      <input type="checkbox" name="audience" value="高齢者">
+      高齢者
+    </label>
+    <label class="resident-audience-option">
+      <input type="checkbox" name="audience" value="子ども連れ">
+      子ども連れ
+    </label>
+    <label class="resident-audience-option">
+      <input type="checkbox" name="audience" value="要配慮者">
+      要配慮者
+    </label>
+    <label class="resident-audience-option">
+      <input type="checkbox" name="audience" value="観光客">
+      観光客
+    </label>
+    <label class="resident-audience-option">
+      <input type="checkbox" name="audience" value="避難所利用者">
+      避難所利用者
+    </label>
+  </fieldset>
 </section>
 
 <section class="board-status" aria-labelledby="board-status-title">
@@ -176,4 +239,25 @@
 {% else %}
 <p>登録されている指示はありません。</p>
 {% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const residentType = document.querySelector('input[name="broadcast_type"][value="住民への情報発信"]');
+    const audienceSection = document.getElementById('resident-audience');
+    const audienceInputs = audienceSection.querySelectorAll('input[name="audience"]');
+
+    function updateAudienceVisibility() {
+      const isResidentBroadcast = residentType.checked;
+      audienceSection.classList.toggle('is-visible', isResidentBroadcast);
+      audienceInputs.forEach(function(input) {
+        input.disabled = !isResidentBroadcast;
+      });
+    }
+
+    document.querySelectorAll('input[name="broadcast_type"]').forEach(function(input) {
+      input.addEventListener('change', updateAudienceVisibility);
+    });
+    updateAudienceVisibility();
+  });
+</script>
 {% endblock %}
