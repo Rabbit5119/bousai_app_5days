@@ -4,31 +4,278 @@
   <meta charset="utf-8">
   <title>{% block title %}防災アプリ{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if request.endpoint == 'index' %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --home-blue: #2458a6;
+      --home-green: #27a34a;
+      --home-border: #edf1f5;
+      --home-text: #334155;
+    }
+
+    * { box-sizing: border-box; }
+
+    body.home-page {
+      margin: 0;
+      background: #ffffff;
+      color: var(--home-text);
+      font-family: "Noto Sans JP", sans-serif;
+      font-weight: 400;
+      font-synthesis: none;
+    }
+
+    .home-header {
+      height: 70px;
+      background: var(--home-blue);
+      color: #ffffff;
+    }
+
+    .home-header-inner {
+      position: relative;
+      width: min(100% - 48px, 1375px);
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .home-header h1 {
+      margin: 0;
+      font-size: 25px;
+      font-weight: 700;
+      line-height: 1.4;
+      letter-spacing: 0.03em;
+    }
+
+    .home-header h1 a { color: inherit; text-decoration: none; }
+
+    .home-menu {
+      border: 0;
+      padding: 0;
+      color: #ffffff;
+      background: transparent;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .home-menu-icon {
+      display: block;
+      width: 25px;
+      height: 25px;
+    }
+
+    .home-navigation {
+      position: absolute;
+      top: 57px;
+      right: 0;
+      z-index: 1000;
+      display: none;
+      width: 230px;
+      padding: 8px 0;
+      border: 1px solid var(--home-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 8px 24px rgba(32, 71, 111, 0.18);
+    }
+
+    .home-navigation.is-open { display: block; }
+
+    .home-navigation a {
+      display: block;
+      padding: 12px 18px;
+      color: var(--home-text);
+      font-size: 15px;
+      text-decoration: none;
+    }
+
+    .home-navigation a:hover,
+    .home-navigation a:focus-visible {
+      outline: none;
+      background: #f1f5fb;
+      color: var(--home-blue);
+    }
+
+    .home-main {
+      width: min(100% - 32px, 920px);
+      margin: 32px auto 80px;
+    }
+
+    .home-card {
+      margin-bottom: 36px;
+      padding: 28px;
+      border: 1px solid var(--home-border);
+      border-radius: 17px;
+      background: #ffffff;
+      box-shadow: 0 5px 22px rgba(32, 71, 111, 0.08);
+    }
+
+    .home-card h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 21px;
+      color: var(--home-blue);
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .home-heading-icon {
+      flex: 0 0 auto;
+      width: 27px;
+      height: 27px;
+    }
+
+    #shelterMap {
+      height: 365px !important;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .weather-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .weather-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+      color: var(--home-green);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .weather-refresh-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .weather-panel {
+      padding: 21px 19px 16px;
+      border-radius: 12px;
+      background: #f7f8fa;
+    }
+
+    .weather-panel p { margin: 0 0 12px; font-size: 15px; }
+    .weather-panel p:last-child { margin-bottom: 0; }
+    .weather-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--home-green);
+      font-size: 18px !important;
+      font-weight: 700;
+    }
+
+    .weather-status-icon,
+    .weather-detail-icon {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+    }
+
+    .weather-detail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .home-header-inner { width: min(100% - 32px, 1375px); }
+      .home-main { width: min(100% - 24px, 920px); margin-top: 20px; }
+      .home-card { padding: 20px; margin-bottom: 22px; }
+      .home-card h2 { font-size: 20px; }
+      #shelterMap { height: 300px !important; }
+    }
+  </style>
+  {% endif %}
 </head>
-<body>
+<body class="{% if request.endpoint == 'index' %}home-page{% endif %}">
   <!-- ヘッダー -->
-  <h1>防災アプリ</h1>
+  {% if request.endpoint == 'index' %}
+    <header class="home-header">
+      <div class="home-header-inner">
+        <h1><a href="/">防災アプリ</a></h1>
+        <button class="home-menu" type="button" aria-label="メニュー">
+          <img class="home-menu-icon" src="{{ url_for('static', filename='icons/menu.svg') }}" alt="">
+        </button>
+        <nav class="home-navigation" aria-label="ホームメニュー">
+          <a href="{{ url_for('index') }}">ホーム</a>
+          <a href="{{ url_for('shelter_search') }}">避難所検索</a>
+          <a href="{{ url_for('shelter_register') }}">避難所登録</a>
+          <a href="{{ url_for('board') }}">指示・発信ボード</a>
+          {% if session.logged_in %}
+            <a href="{{ url_for('logout') }}">ログアウト</a>
+          {% else %}
+            <a href="{{ url_for('login') }}">ログイン</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+  {% else %}
+    <h1>防災アプリ</h1>
 
-  <!-- ナビゲーション -->
-  <nav>
-    <a href="/">ホーム</a> |
-    <a href="/shelter_search">避難所検索</a> |
-    <a href="/shelter_register">避難所登録</a> |
-    <a href="/board">指示・発信ボード</a>
-    ｜
-    {% if session.logged_in %}
-      ログイン中{% if session.username %}（{{ session.username }}）{% endif %}
-      <a href="/logout">ログアウト</a>
-    {% else %}
-      未ログイン
-      <a href="/login">ログイン</a>
-    {% endif %}
-  </nav>
-  <hr>
+    <!-- ナビゲーション -->
+    <nav>
+      <a href="/">ホーム</a> |
+      <a href="/shelter_search">避難所検索</a> |
+      <a href="/shelter_register">避難所登録</a> |
+      <a href="/board">指示・発信ボード</a>
+      ̣｜
+      {% if session.logged_in %}
+        ログイン中{% if session.username %}（{{ session.username }}）{% endif %}
+        <a href="/logout">ログアウト</a>
+      {% else %}
+        未ログイン
+        <a href="/login">ログイン</a>
+      {% endif %}
+    </nav>
+    <hr>
+  {% endif %}
 
-  <main>
+  <main class="{% if request.endpoint == 'index' %}home-main{% endif %}">
     <!-- ここに子テンプレートの content が入る -->
     {% block content %}{% endblock %}
   </main>
+  {% if request.endpoint == 'index' %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuButton = document.querySelector('.home-menu');
+      const navigation = document.querySelector('.home-navigation');
+
+      function closeMenu() {
+        navigation.classList.remove('is-open');
+        menuButton.setAttribute('aria-expanded', 'false');
+      }
+
+      menuButton.addEventListener('click', function() {
+        const isOpen = navigation.classList.toggle('is-open');
+        menuButton.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      document.addEventListener('click', function(event) {
+        if (!navigation.contains(event.target) && !menuButton.contains(event.target)) {
+          closeMenu();
+        }
+      });
+
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          closeMenu();
+          menuButton.focus();
+        }
+      });
+    });
+  </script>
+  {% endif %}
 </body>
 </html>

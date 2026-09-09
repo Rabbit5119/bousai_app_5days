@@ -2,15 +2,30 @@
 
 {% block content %}
 <!-- 避難所マップ -->
-<h2>避難所マップ</h2>
-<div id="shelterMap" style="height: 300px;"></div>
+<section class="home-card map-card">
+    <h2>
+        <img class="home-heading-icon" src="{{ url_for('static', filename='icons/map-pin.svg') }}" alt="">
+        避難所マップ
+    </h2>
+    <div id="shelterMap"></div>
+</section>
 
 <!-- 気象警報・注意報 -->
-<h2>青森市 気象警報・注意報</h2>
-<p>10分おきに自動更新されます。</p>
-<div id="weatherContent">
-  <p>読み込み中...</p>
-</div>
+<section class="home-card weather-card">
+    <div class="weather-heading">
+        <h2>
+            <img class="home-heading-icon" src="{{ url_for('static', filename='icons/weather.svg') }}" alt="">
+            青森市 気象警報・注意報
+        </h2>
+        <span class="weather-refresh">
+            <img class="weather-refresh-icon" src="{{ url_for('static', filename='icons/refresh.svg') }}" alt="">
+            10分おき自動更新
+        </span>
+    </div>
+    <div id="weatherContent" class="weather-panel">
+        <p>読み込み中...</p>
+    </div>
+</section>
 
 <!-- Leaflet の読み込み -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -55,14 +70,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             warningsHtml += '</ul>';
         } else {
-            warningsHtml = '<p>現在、警報・注意報は発表されていません</p>';
+            warningsHtml = '<p class="weather-status"><img class="weather-status-icon" src="{{ url_for('static', filename='icons/check-circle.svg') }}" alt="">現在、警報・注意報は発表されていません</p>';
         }
 
         weatherContent.innerHTML = `
-            <p>対象地域: ${data.area_name || '青森市'}</p>
+            <p class="weather-detail"><img class="weather-detail-icon" src="{{ url_for('static', filename='icons/map-pin.svg') }}" alt="">${data.area_name || '青森市'}</p>
             ${warningsHtml}
-            <p>最終確認: <span id="lastFetchTime">${data.last_fetch_time || '更新中...'}</span></p>
-            <p>気象庁最終発表: ${data.report_time || '不明'}</p>
+            <p class="weather-detail"><img class="weather-detail-icon" src="{{ url_for('static', filename='icons/clock.svg') }}" alt="">データ取得: <span id="lastFetchTime">${data.last_fetch_time || '更新中...'}</span></p>
+            <p class="weather-detail"><img class="weather-detail-icon" src="{{ url_for('static', filename='icons/announcement.svg') }}" alt="">気象庁最終発表: ${data.report_time || '不明'}</p>
         `;
     }
 
