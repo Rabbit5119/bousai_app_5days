@@ -101,6 +101,25 @@ def save_instructions():
             json.dump(instructions, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
+
+
+def get_board_status_counts(board_instructions):
+    """指示ボードに表示するステータスと本日発信の件数を集計する"""
+    today = datetime.now(JST).strftime('%Y年%m月%d日')
+    return {
+        'unconfirmed': sum(
+            instruction.get('status') == '未確認'
+            for instruction in board_instructions
+        ),
+        'in_progress': sum(
+            instruction.get('status') == '対応中'
+            for instruction in board_instructions
+        ),
+        'today': sum(
+            instruction.get('created_at', '').startswith(today)
+            for instruction in board_instructions
+        )
+    }
 # ────────────────────────────────
 
 # ────────────────────────────────
@@ -322,7 +341,12 @@ def all_shelters():
 @login_required
 def board():
     resident_instructions = [i for i in instructions if i.get('target') == '住民']
-    return render_template('board.html', instructions=resident_instructions)
+    status_counts = get_board_status_counts(resident_instructions)
+    return render_template(
+        'board.html',
+        instructions=resident_instructions,
+        status_counts=status_counts
+    )
 
 # 検索結果ページ：templates/search_results.html を返す
 @app.route('/search_results')

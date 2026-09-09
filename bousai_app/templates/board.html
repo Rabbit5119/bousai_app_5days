@@ -3,8 +3,162 @@
 {% block title %}指示・発信ボード - 防災アプリ{% endblock %}
 
 {% block content %}
+<style>
+  .board-status {
+    margin: 24px 0;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f8fafc;
+  }
+
+  .board-status h3 {
+    margin: 0 0 16px;
+  }
+
+  .board-status-list {
+    display: flex;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .board-status-item {
+    flex: 1;
+    padding: 14px 12px;
+    border-radius: 8px;
+    background: #ffffff;
+    text-align: center;
+  }
+
+  .board-status-label,
+  .board-status-count {
+    display: block;
+  }
+
+  .board-status-label {
+    margin-bottom: 5px;
+    color: #475569;
+  }
+
+  .board-status-count {
+    color: #2458a6;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .new-broadcast {
+    margin: 24px 0;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+  }
+
+  .new-broadcast h3 {
+    margin: 0 0 16px;
+  }
+
+  .disaster-name-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-weight: 700;
+  }
+
+  .disaster-name-select {
+    width: min(100%, 420px);
+    min-height: 44px;
+    padding: 8px 40px 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font: inherit;
+  }
+
+  .broadcast-type {
+    margin-top: 20px;
+  }
+
+  .broadcast-type legend {
+    margin-bottom: 8px;
+    color: #334155;
+    font-weight: 700;
+  }
+
+  .broadcast-type-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0;
+    color: #334155;
+    cursor: pointer;
+  }
+
+  .broadcast-type-option input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #2458a6;
+  }
+
+  @media (max-width: 640px) {
+    .board-status-list {
+      flex-direction: column;
+    }
+  }
+</style>
+
 <h2>発信ボード</h2>
 <p>住民向けの発信を登録・確認できます。</p>
+
+<section class="new-broadcast" aria-labelledby="new-broadcast-title">
+  <h3 id="new-broadcast-title">新規 指示・発信</h3>
+  <label class="disaster-name-label" for="disaster-name">災害名</label>
+  <select class="disaster-name-select" id="disaster-name" name="disaster_name">
+    <option value="津波" selected>津波</option>
+    <option value="河川氾濫">河川氾濫</option>
+    <option value="道路冠水">道路冠水</option>
+    <option value="土砂崩れ">土砂崩れ</option>
+    <option value="積雪による道路遮断">積雪による道路遮断</option>
+    <option value="獣害">獣害</option>
+    <option value="山火事">山火事</option>
+  </select>
+
+  <fieldset class="broadcast-type">
+    <legend>種類</legend>
+    <label class="broadcast-type-option">
+      <input type="radio" name="broadcast_type" value="職員への指示" checked>
+      職員への指示
+    </label>
+    <label class="broadcast-type-option">
+      <input type="radio" name="broadcast_type" value="職員への情報発信">
+      職員への情報発信
+    </label>
+    <label class="broadcast-type-option">
+      <input type="radio" name="broadcast_type" value="住民への情報発信">
+      住民への情報発信
+    </label>
+  </fieldset>
+</section>
+
+<section class="board-status" aria-labelledby="board-status-title">
+  <h3 id="board-status-title">現在の状況</h3>
+  <div class="board-status-list">
+    <div class="board-status-item">
+      <span class="board-status-label">未確認</span>
+      <span class="board-status-count">{{ status_counts.unconfirmed }}件</span>
+    </div>
+    <div class="board-status-item">
+      <span class="board-status-label">対応中</span>
+      <span class="board-status-count">{{ status_counts.in_progress }}件</span>
+    </div>
+    <div class="board-status-item">
+      <span class="board-status-label">本日発信</span>
+      <span class="board-status-count">{{ status_counts.today }}件</span>
+    </div>
+  </div>
+</section>
 
 <!-- 発信一覧 -->
 <h3>発信一覧</h3>
