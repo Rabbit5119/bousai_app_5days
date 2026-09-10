@@ -104,22 +104,63 @@ def save_instructions():
 
 
 def get_board_status_counts(board_instructions):
-    """指示ボードに表示するステータスと本日発信の件数を集計する"""
-    today = datetime.now(JST).strftime('%Y年%m月%d日')
+    """下書き・期限内の公開・本日発信の件数を集計する"""
+    now = datetime.now(JST)
+    today = now.strftime('%Y年%m月%d日')
+
+    def is_active(instruction):
+        deadline = instruction.get('deadline', '')
+        if not deadline or deadline == '―':
+            return True
+        try:
+            deadline_at = datetime.strptime(deadline, '%Y-%m-%d %H:%M')
+            deadline_at = deadline_at.replace(tzinfo=JST)
+            return deadline_at >= now
+        except ValueError:
+            return False
+
     return {
-        'unconfirmed': sum(
-            instruction.get('status') == '未確認'
+        'in_progress': sum(
+            instruction.get('source') == 'draft'
             for instruction in board_instructions
         ),
-        'in_progress': sum(
-            instruction.get('status') == '対応中'
+        'published': sum(
+            instruction.get('source') == 'broadcast' and is_active(instruction)
             for instruction in board_instructions
         ),
         'today': sum(
-            instruction.get('created_at', '').startswith(today)
+            instruction.get('source') == 'broadcast'
+            and instruction.get('created_at', '').startswith(today)
             for instruction in board_instructions
         )
     }
+
+
+def get_broadcast_entries():
+    """保存済みの公開指示・発信だけを一覧用データに変換する"""
+    entries = []
+    for instruction in instructions:
+        if instruction.get('source') != 'broadcast':
+            continue
+        entry = dict(instruction)
+        target_values = []
+        if instruction.get('broadcast_type') == '住民への情報発信':
+            target_values = [
+                '避難利用者' if value == '避難所利用者' else value
+                for value in instruction.get('audience', [])
+            ]
+        entry['target_values'] = target_values
+        entry['display_target'] = '、'.join(target_values)
+        entries.append(entry)
+    return entries
+
+
+def get_draft_entries():
+    """保存済みの下書きだけを返す"""
+    return [
+        instruction for instruction in instructions
+        if instruction.get('source') == 'draft'
+    ]
 # ────────────────────────────────
 
 # ────────────────────────────────
@@ -337,15 +378,95 @@ def all_shelters():
 
 
 # 指示ボード：住民向けの指示を一覧で確認する
-@app.route('/board')
+@app.route('/board', methods=['GET', 'POST'])
 @login_required
 def board():
+    action = request.form.get('action')
+    if request.method == 'POST' and action == 'delete':
+        delete_id = request.form.get('id', type=int)
+        instructions[:] = [
+            instruction for instruction in instructions
+            if instruction.get('id') != delete_id
+        ]
+        save_instructions()
+        return redirect(url_for('board'))
+
+    if request.method == 'POST' and action in ('draft', 'publish'):
+        broadcast_type = request.form.get('broadcast_type', '')
+        content = request.form.get('content', '').strip()
+        disaster_name = request.form.get('disaster_name', '').strip()
+        shelter = request.form.get('shelter', '').strip()
+        priority = request.form.get('priority', '').strip()
+        audience = request.form.getlist('audience')
+
+        required_values_present = all(
+            (disaster_name, content, shelter, broadcast_type, priority)
+        )
+        audience_is_valid = broadcast_type != '住民への情報発信' or bool(audience)
+        can_save = action == 'draft' or (
+            required_values_present and audience_is_valid
+        )
+        if can_save:
+            is_instruction = broadcast_type == '職員への指示'
+            created_at = get_japan_time()
+            deadline_date = request.form.get('display_until_date', '').strip()
+            deadline_time = request.form.get('display_until_time', '').strip()
+            deadline = (
+                f'{deadline_date} {deadline_time}'
+                if deadline_date and deadline_time else '―'
+            )
+            broadcast_data = {
+                'source': 'draft' if action == 'draft' else 'broadcast',
+                'target': (
+                    ', '.join(audience)
+                    if broadcast_type == '住民への情報発信' else ''
+                ),
+                'kind': '指示' if is_instruction else '発信',
+                'department': shelter if is_instruction else 'すべて',
+                'region': ', '.join(audience) if audience else 'すべて',
+                'content': content,
+                'deadline': deadline,
+                'status': '下書き' if action == 'draft' else ('未確認' if is_instruction else '発信済'),
+                'disaster_name': disaster_name,
+                'broadcast_type': broadcast_type,
+                'priority': priority,
+                'shelter': shelter,
+                'audience': audience,
+                'display_until_date': deadline_date,
+                'display_until_time': deadline_time,
+                'created_at': created_at,
+                'updated_at': created_at
+            }
+            edit_id = request.form.get('edit_id', type=int)
+            existing = next(
+                (item for item in instructions if item.get('id') == edit_id),
+                None
+            )
+            can_update_existing = existing and (
+                existing.get('source') == 'draft'
+                or action == 'publish' and existing.get('source') == 'broadcast'
+            )
+            if can_update_existing:
+                existing.update(broadcast_data)
+            else:
+                broadcast_data['id'] = max(
+                    (item.get('id', 0) for item in instructions),
+                    default=0
+                ) + 1
+                instructions.append(broadcast_data)
+            save_instructions()
+            return redirect(url_for('board'))
+
     resident_instructions = [i for i in instructions if i.get('target') == '住民']
-    status_counts = get_board_status_counts(resident_instructions)
+    broadcast_entries = get_broadcast_entries()
+    status_counts = get_board_status_counts(instructions)
     return render_template(
         'board.html',
         instructions=resident_instructions,
-        status_counts=status_counts
+        status_counts=status_counts,
+        shelters=shelters,
+        broadcast_entries=broadcast_entries,
+        draft_entries=get_draft_entries()
     )
 
 # 検索結果ページ：templates/search_results.html を返す

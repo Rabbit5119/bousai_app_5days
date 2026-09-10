@@ -4,12 +4,32 @@
 
 {% block content %}
 <style>
+  .board-status,
+  .new-broadcast,
+  .draft-panel,
+  .broadcast-list {
+    border: 1px solid #edf1f5;
+    border-radius: 17px;
+    background: #ffffff;
+    box-shadow: 0 5px 22px rgba(32, 71, 111, 0.08);
+  }
+
+  .board-status,
+  .broadcast-list {
+    padding: 28px;
+  }
+
+  .board-status h3,
+  .new-broadcast h3,
+  .draft-panel h3,
+  .broadcast-list h3 {
+    color: #2458a6;
+    font-size: 21px;
+    line-height: 1.45;
+  }
+
   .board-status {
     margin: 24px 0;
-    padding: 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    background: #f8fafc;
   }
 
   .board-status h3 {
@@ -49,9 +69,82 @@
   .new-broadcast {
     margin: 24px 0;
     padding: 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+  }
+
+  .broadcast-compose {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .broadcast-compose .new-broadcast {
+    margin: 24px 0;
+  }
+
+  .draft-panel {
+    margin: 24px 0;
+    padding: 20px;
+  }
+
+  .draft-panel h3 {
+    margin: 0 0 16px;
+  }
+
+  .draft-card {
+    padding: 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
     background: #ffffff;
+  }
+
+  .draft-card + .draft-card {
+    margin-top: 10px;
+  }
+
+  .draft-card p {
+    margin: 0 0 10px;
+    color: #334155;
+    font-size: 14px;
+  }
+
+  .draft-apply-button {
+    min-height: 36px;
+    padding: 6px 13px;
+    border: 1px solid #2458a6;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #2458a6;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .draft-apply-button:hover,
+  .draft-apply-button:focus-visible {
+    background: #eef4ff;
+  }
+
+  .draft-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .draft-delete-button {
+    min-height: 36px;
+    padding: 6px 13px;
+    border: 1px solid #dc2626;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #dc2626;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .draft-delete-button:hover,
+  .draft-delete-button:focus-visible {
+    background: #fff1f2;
   }
 
   .new-broadcast h3 {
@@ -65,8 +158,88 @@
     font-weight: 700;
   }
 
+  .required-mark {
+    margin-left: 4px;
+    color: #dc2626;
+    font-weight: 700;
+  }
+
   .disaster-name-select {
     width: min(100%, 420px);
+    min-height: 44px;
+    padding: 8px 40px 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font: inherit;
+  }
+
+  .broadcast-content {
+    margin-top: 20px;
+  }
+
+  .broadcast-content-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-weight: 700;
+  }
+
+  .broadcast-content-input {
+    display: block;
+    width: min(100%, 620px);
+    min-height: 120px;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font: inherit;
+    line-height: 1.6;
+    resize: vertical;
+  }
+
+  .broadcast-expiration {
+    margin-top: 20px;
+  }
+
+  .broadcast-expiration-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-weight: 700;
+  }
+
+  .broadcast-expiration-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .broadcast-expiration-input {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font: inherit;
+  }
+
+  .related-shelter {
+    margin-top: 20px;
+  }
+
+  .related-shelter-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-weight: 700;
+  }
+
+  .related-shelter-select {
+    width: min(100%, 620px);
     min-height: 44px;
     padding: 8px 40px 8px 12px;
     border: 1px solid #cbd5e1;
@@ -137,7 +310,162 @@
     accent-color: #2458a6;
   }
 
+  .broadcast-priority {
+    margin: 20px 0 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .broadcast-priority legend {
+    margin-bottom: 8px;
+    color: #334155;
+    font-weight: 700;
+  }
+
+  .broadcast-priority-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  .broadcast-priority-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #334155;
+    cursor: pointer;
+  }
+
+  .broadcast-priority-option input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #2458a6;
+  }
+
+  .broadcast-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .broadcast-action {
+    min-width: 180px;
+    min-height: 44px;
+    padding: 9px 18px;
+    border: 1px solid #2458a6;
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .broadcast-action-draft {
+    background: #ffffff;
+    color: #2458a6;
+  }
+
+  .broadcast-action-publish {
+    background: #2458a6;
+    color: #ffffff;
+  }
+
+  .broadcast-action:hover,
+  .broadcast-action:focus-visible {
+    filter: brightness(0.94);
+  }
+
+  .form-validation-message {
+    margin: 12px 0 0;
+    color: #dc2626;
+    font-size: 14px;
+  }
+
+  .broadcast-list {
+    margin-top: 32px;
+  }
+
+  .broadcast-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .broadcast-filter-select {
+    min-width: 150px;
+    min-height: 40px;
+    padding: 7px 32px 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font: inherit;
+  }
+
+  .broadcast-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .broadcast-table {
+    width: 100%;
+    min-width: 1080px;
+    border-collapse: collapse;
+    color: #334155;
+  }
+
+  .broadcast-table th,
+  .broadcast-table td {
+    padding: 13px 12px;
+    border-top: 1px solid #cbd5e1;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .broadcast-table th {
+    background: #f8fafc;
+    font-weight: 700;
+  }
+
+  .broadcast-table tr:last-child td {
+    border-bottom: 1px solid #cbd5e1;
+  }
+
+  .broadcast-table [data-column="content"] {
+    white-space: normal;
+  }
+
+  .broadcast-table-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .list-action {
+    min-height: 32px;
+    padding: 5px 10px;
+    border: 1px solid #2458a6;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #2458a6;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .list-action-delete {
+    border-color: #dc2626;
+    color: #dc2626;
+  }
+
+  .broadcast-table-empty[hidden] {
+    display: none;
+  }
+
   @media (max-width: 640px) {
+    .broadcast-compose {
+      display: block;
+    }
+
     .board-status-list {
       flex-direction: column;
     }
@@ -147,11 +475,32 @@
 <h2>発信ボード</h2>
 <p>住民向けの発信を登録・確認できます。</p>
 
-<section class="new-broadcast" aria-labelledby="new-broadcast-title">
+<section class="board-status" aria-labelledby="board-status-title">
+  <h3 id="board-status-title">現在の状況</h3>
+  <div class="board-status-list">
+    <div class="board-status-item">
+      <span class="board-status-label">対応中</span>
+      <span class="board-status-count">{{ status_counts.in_progress }}件</span>
+    </div>
+    <div class="board-status-item">
+      <span class="board-status-label">発信済</span>
+      <span class="board-status-count">{{ status_counts.published }}件</span>
+    </div>
+    <div class="board-status-item">
+      <span class="board-status-label">本日発信</span>
+      <span class="board-status-count">{{ status_counts.today }}件</span>
+    </div>
+  </div>
+</section>
+
+<div class="broadcast-compose">
+<form class="new-broadcast" id="broadcast-form" action="" method="post" novalidate>
   <h3 id="new-broadcast-title">新規 指示・発信</h3>
-  <label class="disaster-name-label" for="disaster-name">災害名</label>
-  <select class="disaster-name-select" id="disaster-name" name="disaster_name">
-    <option value="津波" selected>津波</option>
+  <input type="hidden" id="edit-id" name="edit_id" value="">
+  <label class="disaster-name-label" for="disaster-name">災害名<span class="required-mark" aria-hidden="true">＊</span></label>
+  <select class="disaster-name-select" id="disaster-name" name="disaster_name" required>
+    <option value="" selected>災害名を選択してください</option>
+    <option value="津波">津波</option>
     <option value="河川氾濫">河川氾濫</option>
     <option value="道路冠水">道路冠水</option>
     <option value="土砂崩れ">土砂崩れ</option>
@@ -160,10 +509,33 @@
     <option value="山火事">山火事</option>
   </select>
 
+  <div class="broadcast-content">
+    <label class="broadcast-content-label" for="broadcast-content-input">内容<span class="required-mark" aria-hidden="true">＊</span></label>
+    <textarea class="broadcast-content-input" id="broadcast-content-input" name="content" placeholder="内容を入力してください" required></textarea>
+  </div>
+
+  <div class="broadcast-expiration">
+    <label class="broadcast-expiration-label" for="display-until-date">表示期限</label>
+    <div class="broadcast-expiration-fields">
+      <input class="broadcast-expiration-input" type="date" id="display-until-date" name="display_until_date" aria-label="表示期限の日付">
+      <input class="broadcast-expiration-input" type="time" id="display-until-time" name="display_until_time" value="16:00" aria-label="表示期限の時刻">
+    </div>
+  </div>
+
+  <div class="related-shelter">
+    <label class="related-shelter-label" for="related-shelter">関連する避難所<span class="required-mark" aria-hidden="true">＊</span></label>
+    <select class="related-shelter-select" id="related-shelter" name="shelter" required>
+      <option value="" selected>避難所を選択してください</option>
+      {% for shelter in shelters %}
+        <option value="{{ shelter.name }}">{{ shelter.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
   <fieldset class="broadcast-type">
-    <legend>種類</legend>
+    <legend>種類<span class="required-mark" aria-hidden="true">＊</span></legend>
     <label class="broadcast-type-option">
-      <input type="radio" name="broadcast_type" value="職員への指示" checked>
+      <input type="radio" name="broadcast_type" value="職員への指示" required>
       職員への指示
     </label>
     <label class="broadcast-type-option">
@@ -171,15 +543,15 @@
       職員への情報発信
     </label>
     <label class="broadcast-type-option">
-      <input type="radio" name="broadcast_type" value="住民への情報発信">
+        <input type="radio" name="broadcast_type" value="住民への情報発信">
       住民への情報発信
     </label>
   </fieldset>
 
   <fieldset class="resident-audience" id="resident-audience" aria-labelledby="resident-audience-title">
-    <legend id="resident-audience-title">対象者</legend>
+    <legend id="resident-audience-title">対象者<span class="required-mark" aria-hidden="true">＊</span></legend>
     <label class="resident-audience-option">
-      <input type="checkbox" name="audience" value="全住民">
+      <input type="checkbox" name="audience" value="全住民" aria-required="true">
       全住民
     </label>
     <label class="resident-audience-option">
@@ -199,52 +571,207 @@
       観光客
     </label>
     <label class="resident-audience-option">
-      <input type="checkbox" name="audience" value="避難所利用者">
-      避難所利用者
+      <input type="checkbox" name="audience" value="避難利用者">
+      避難利用者
     </label>
   </fieldset>
-</section>
 
-<section class="board-status" aria-labelledby="board-status-title">
-  <h3 id="board-status-title">現在の状況</h3>
-  <div class="board-status-list">
-    <div class="board-status-item">
-      <span class="board-status-label">未確認</span>
-      <span class="board-status-count">{{ status_counts.unconfirmed }}件</span>
+  <fieldset class="broadcast-priority">
+    <legend>優先度<span class="required-mark" aria-hidden="true">＊</span></legend>
+    <div class="broadcast-priority-options">
+      <label class="broadcast-priority-option">
+        <input type="radio" name="priority" value="緊急" required>
+        緊急
+      </label>
+      <label class="broadcast-priority-option">
+        <input type="radio" name="priority" value="高">
+        高
+      </label>
+      <label class="broadcast-priority-option">
+        <input type="radio" name="priority" value="通常" checked>
+        通常
+      </label>
     </div>
-    <div class="board-status-item">
-      <span class="board-status-label">対応中</span>
-      <span class="board-status-count">{{ status_counts.in_progress }}件</span>
-    </div>
-    <div class="board-status-item">
-      <span class="board-status-label">本日発信</span>
-      <span class="board-status-count">{{ status_counts.today }}件</span>
-    </div>
+  </fieldset>
+
+  <div class="broadcast-actions">
+    <button class="broadcast-action broadcast-action-draft" type="submit" name="action" value="draft">下書き保存</button>
+    <button class="broadcast-action broadcast-action-publish" type="submit" name="action" value="publish">指示・発信する</button>
   </div>
-</section>
+  <p class="form-validation-message" id="form-validation-message" role="alert" tabindex="-1" hidden>選択していない必須項目があります。</p>
+</form>
 
-<!-- 発信一覧 -->
-<h3>発信一覧</h3>
-{% if instructions %}
-<table border="1" cellpadding="5">
-  <tr>
-    <th>内容</th>
-  </tr>
-  {% for inst in instructions %}
-  <tr>
-    <td>{{ inst.content }}{% if inst.shelter %}（避難先: {{ inst.shelter }}）{% endif %}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% else %}
-<p>登録されている指示はありません。</p>
-{% endif %}
+<aside class="draft-panel" aria-labelledby="draft-panel-title">
+  <h3 id="draft-panel-title">下書き</h3>
+  {% if draft_entries %}
+    {% for draft in draft_entries %}
+    <div class="draft-card">
+      <p>{{ draft.disaster_name }}: {{ draft.content }}</p>
+      <div class="draft-actions">
+        <button
+          class="draft-apply-button"
+          type="button"
+          data-draft-id="{{ draft.id }}"
+          data-disaster-name="{{ draft.disaster_name }}"
+          data-content="{{ draft.content }}"
+          data-display-until-date="{{ draft.display_until_date }}"
+          data-display-until-time="{{ draft.display_until_time }}"
+          data-shelter="{{ draft.shelter }}"
+          data-broadcast-type="{{ draft.broadcast_type }}"
+          data-audience="{{ draft.audience|join('|') }}"
+          data-priority="{{ draft.priority }}"
+        >適用</button>
+        <form method="post" action="" onsubmit="return confirm('この下書きを削除しますか？');">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="id" value="{{ draft.id }}">
+          <button class="draft-delete-button" type="submit">削除</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p>保存された下書きはありません。</p>
+  {% endif %}
+</aside>
+</div>
+
+<section class="broadcast-list" aria-labelledby="broadcast-list-title">
+  <h3 id="broadcast-list-title">指示・発信一覧</h3>
+  <div class="broadcast-filter" aria-label="一覧の絞り込み">
+    <select class="broadcast-filter-select" id="filter-disaster" aria-label="災害別で絞り込み">
+      <option value="all">災害別</option>
+      {% for entry in broadcast_entries|map(attribute='disaster_name')|unique %}
+        {% if entry %}<option value="{{ entry }}">{{ entry }}</option>{% endif %}
+      {% endfor %}
+    </select>
+    <select class="broadcast-filter-select" id="filter-priority" aria-label="優先度別で絞り込み">
+      <option value="all">優先度別</option>
+      {% for entry in broadcast_entries|map(attribute='priority')|unique %}
+        {% if entry %}<option value="{{ entry }}">{{ entry }}</option>{% endif %}
+      {% endfor %}
+    </select>
+    <select class="broadcast-filter-select" id="filter-target" aria-label="対象者別で絞り込み">
+      <option value="all">対象者別</option>
+      <option value="全住民">全住民</option>
+      <option value="高齢者">高齢者</option>
+      <option value="子ども連れ">子ども連れ</option>
+      <option value="要配慮者">要配慮者</option>
+      <option value="観光客">観光客</option>
+      <option value="避難利用者">避難利用者</option>
+    </select>
+  </div>
+
+  <div class="broadcast-table-wrapper">
+    <table class="broadcast-table">
+      <thead>
+        <tr>
+          <th>災害名</th>
+          <th>種類</th>
+          <th>対象</th>
+          <th>内容</th>
+          <th>表示期限</th>
+          <th>関連する避難所</th>
+          <th>優先度</th>
+          <th>状態</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="broadcast-table-body">
+        {% for entry in broadcast_entries %}
+        {% set display_target = entry.display_target %}
+        <tr data-disaster="{{ entry.disaster_name }}" data-priority="{{ entry.priority }}" data-targets="{{ entry.target_values|join('|') }}">
+          <td>{{ entry.disaster_name }}</td>
+          <td>{{ entry.kind }}</td>
+          <td>{{ display_target }}</td>
+          <td data-column="content">{{ entry.content }}</td>
+          <td>{{ entry.deadline }}</td>
+          <td>{{ entry.shelter }}</td>
+          <td>{{ entry.priority }}</td>
+          <td>{{ entry.status }}</td>
+          <td>
+            {% if entry.source == 'broadcast' %}
+            <div class="broadcast-table-actions">
+              <button
+                class="list-action edit-broadcast-button"
+                type="button"
+                data-id="{{ entry.id }}"
+                data-disaster-name="{{ entry.disaster_name }}"
+                data-content="{{ entry.content }}"
+                data-display-until-date="{{ entry.display_until_date }}"
+                data-display-until-time="{{ entry.display_until_time }}"
+                data-shelter="{{ entry.shelter }}"
+                data-broadcast-type="{{ entry.broadcast_type }}"
+                data-audience="{{ entry.audience|join('|') }}"
+                data-priority="{{ entry.priority }}"
+              >編集</button>
+              <form method="post" action="" onsubmit="return confirm('この指示・発信を削除しますか？');">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="id" value="{{ entry.id }}">
+                <button class="list-action list-action-delete" type="submit">削除</button>
+              </form>
+            </div>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="broadcast-table-empty" id="broadcast-table-empty" hidden>条件に一致する指示・発信はありません。</p>
+</section>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const residentType = document.querySelector('input[name="broadcast_type"][value="住民への情報発信"]');
     const audienceSection = document.getElementById('resident-audience');
     const audienceInputs = audienceSection.querySelectorAll('input[name="audience"]');
+    const broadcastForm = document.getElementById('broadcast-form');
+
+    document.querySelectorAll('.edit-broadcast-button').forEach(function(button) {
+      button.addEventListener('click', function() {
+        document.getElementById('edit-id').value = button.dataset.id;
+        document.getElementById('new-broadcast-title').textContent = '指示・発信を編集';
+        document.getElementById('disaster-name').value = button.dataset.disasterName;
+        document.getElementById('broadcast-content-input').value = button.dataset.content;
+        document.getElementById('display-until-date').value = button.dataset.displayUntilDate;
+        document.getElementById('display-until-time').value = button.dataset.displayUntilTime;
+        document.getElementById('related-shelter').value = button.dataset.shelter;
+        document.querySelectorAll('input[name="broadcast_type"]').forEach(function(input) {
+          input.checked = input.value === button.dataset.broadcastType;
+        });
+        document.querySelectorAll('input[name="audience"]').forEach(function(input) {
+          input.checked = button.dataset.audience.split('|').includes(input.value);
+        });
+        document.querySelectorAll('input[name="priority"]').forEach(function(input) {
+          input.checked = input.value === button.dataset.priority;
+        });
+        updateAudienceVisibility();
+        broadcastForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    document.querySelectorAll('.draft-apply-button').forEach(function(button) {
+      button.addEventListener('click', function() {
+        document.getElementById('edit-id').value = button.dataset.draftId;
+        document.getElementById('new-broadcast-title').textContent = '下書きを編集';
+        document.getElementById('disaster-name').value = button.dataset.disasterName;
+        document.getElementById('broadcast-content-input').value = button.dataset.content;
+        document.getElementById('display-until-date').value = button.dataset.displayUntilDate;
+        document.getElementById('display-until-time').value = button.dataset.displayUntilTime;
+        document.getElementById('related-shelter').value = button.dataset.shelter;
+        document.querySelectorAll('input[name="broadcast_type"]').forEach(function(input) {
+          input.checked = input.value === button.dataset.broadcastType;
+        });
+        document.querySelectorAll('input[name="audience"]').forEach(function(input) {
+          input.checked = button.dataset.audience.split('|').includes(input.value);
+        });
+        document.querySelectorAll('input[name="priority"]').forEach(function(input) {
+          input.checked = input.value === button.dataset.priority;
+        });
+        updateAudienceVisibility();
+        document.getElementById('broadcast-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
 
     function updateAudienceVisibility() {
       const isResidentBroadcast = residentType.checked;
@@ -252,12 +779,80 @@
       audienceInputs.forEach(function(input) {
         input.disabled = !isResidentBroadcast;
       });
+      validateAudience();
+    }
+
+    function validateAudience() {
+      const isResidentBroadcast = residentType.checked;
+      const hasAudience = Array.from(audienceInputs).some(function(input) {
+        return input.checked;
+      });
+      audienceInputs[0].setCustomValidity(
+        isResidentBroadcast && !hasAudience ? '対象者を1つ以上選択してください。' : ''
+      );
+    }
+
+    function hasMissingRequiredFields() {
+      const requiredFields = broadcastForm.querySelectorAll('[required]');
+      const hasMissingField = Array.from(requiredFields).some(function(field) {
+        if (field.type === 'radio') {
+          return !broadcastForm.querySelector('input[name="' + field.name + '"]:checked');
+        }
+        return !field.value.trim();
+      });
+      const isResidentBroadcast = residentType.checked;
+      const hasAudience = Array.from(audienceInputs).some(function(input) {
+        return input.checked;
+      });
+      return hasMissingField || (isResidentBroadcast && !hasAudience);
     }
 
     document.querySelectorAll('input[name="broadcast_type"]').forEach(function(input) {
       input.addEventListener('change', updateAudienceVisibility);
     });
+    audienceInputs.forEach(function(input) {
+      input.addEventListener('change', validateAudience);
+    });
+    broadcastForm.addEventListener('submit', function(event) {
+      const validationMessage = document.getElementById('form-validation-message');
+      const submitAction = event.submitter ? event.submitter.value : 'publish';
+      if (submitAction === 'draft') {
+        validationMessage.hidden = true;
+        return;
+      }
+      const hasMissingFields = hasMissingRequiredFields();
+      validationMessage.hidden = !hasMissingFields;
+      if (hasMissingFields) {
+        event.preventDefault();
+        validationMessage.focus();
+      }
+    });
     updateAudienceVisibility();
+
+    const filterDisaster = document.getElementById('filter-disaster');
+    const filterPriority = document.getElementById('filter-priority');
+    const filterTarget = document.getElementById('filter-target');
+    const broadcastRows = document.querySelectorAll('#broadcast-table-body tr');
+    const emptyMessage = document.getElementById('broadcast-table-empty');
+
+    function filterBroadcasts() {
+      let visibleRows = 0;
+      broadcastRows.forEach(function(row) {
+        const matchesDisaster = filterDisaster.value === 'all' || row.dataset.disaster === filterDisaster.value;
+        const matchesPriority = filterPriority.value === 'all' || row.dataset.priority === filterPriority.value;
+        const matchesTarget = filterTarget.value === 'all' || row.dataset.targets.split('|').includes(filterTarget.value);
+        const isVisible = matchesDisaster && matchesPriority && matchesTarget;
+        row.hidden = !isVisible;
+        if (isVisible) {
+          visibleRows += 1;
+        }
+      });
+      emptyMessage.hidden = visibleRows !== 0;
+    }
+
+    [filterDisaster, filterPriority, filterTarget].forEach(function(filter) {
+      filter.addEventListener('change', filterBroadcasts);
+    });
   });
 </script>
 {% endblock %}

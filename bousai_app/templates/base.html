@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>{% block title %}防災アプリ{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% if request.endpoint == 'index' %}
+  {% if request.endpoint in ('index', 'board') %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -25,6 +25,32 @@
       font-family: "Noto Sans JP", sans-serif;
       font-weight: 400;
       font-synthesis: none;
+    }
+
+    body.board-page {
+      margin: 0;
+      background: #f7f9fc;
+      color: var(--home-text);
+      font-family: "Noto Sans JP", sans-serif;
+      font-weight: 400;
+      font-synthesis: none;
+    }
+
+    .board-page .board-main {
+      width: min(100% - 32px, 1280px);
+      margin: 32px auto 80px;
+    }
+
+    .board-page h2 {
+      margin: 0 0 8px;
+      color: var(--home-blue);
+      font-size: 25px;
+      line-height: 1.45;
+    }
+
+    .board-page > .board-main > p {
+      margin: 0 0 24px;
+      color: #64748b;
     }
 
     .home-header {
@@ -199,9 +225,9 @@
   </style>
   {% endif %}
 </head>
-<body class="{% if request.endpoint == 'index' %}home-page{% endif %}">
+<body class="{% if request.endpoint == 'index' %}home-page{% elif request.endpoint == 'board' %}board-page{% endif %}">
   <!-- ヘッダー -->
-  {% if request.endpoint == 'index' %}
+  {% if request.endpoint in ('index', 'board') %}
     <header class="home-header">
       <div class="home-header-inner">
         <h1><a href="/">防災アプリ</a></h1>
@@ -242,11 +268,11 @@
     <hr>
   {% endif %}
 
-  <main class="{% if request.endpoint == 'index' %}home-main{% endif %}">
+  <main class="{% if request.endpoint == 'index' %}home-main{% elif request.endpoint == 'board' %}board-main{% endif %}">
     <!-- ここに子テンプレートの content が入る -->
     {% block content %}{% endblock %}
   </main>
-  {% if request.endpoint == 'index' %}
+  {% if request.endpoint in ('index', 'board') %}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const menuButton = document.querySelector('.home-menu');
